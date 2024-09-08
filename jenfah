@@ -1,0 +1,33 @@
+sudo apt-get update
+sudo apt-get upgrade
+sudo apt-get install -y build-essential libgmp3-dev cmake git libprocps-dev curl
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+source $HOME/.cargo/env
+git clone https://github.com/Zokrates/ZoKrates.git
+cd ZoKrates
+cargo build --release
+./target/release/zokrates --version
+echo 'export PATH=$PATH:~/ZoKrates/target/release' >> ~/.bashrc
+source ~/.bashrc
+mkdir zokrates-project
+cd zokrates-project
+vim sha256.zok
+import "hashes/sha256/512bitPacked" as sha256packed
+
+def main(private field a,private field b,private field c,private field d,field h0,field h1){
+        field[2] h=sha256packed([a,b,c,d]);
+        assert(h[0]==h0);
+        assert(h[1]==h1);
+        return;
+}
+ls
+cat sha256.zok
+zokrates compile -i sha256.zok
+zokrates setup
+input.txt out out.rics sha256.zok
+Verification key written to 'verification.key'
+Proving key written to 'proving.key'
+ls
+zokrates compute-witness -a 000 1129529685 285551088474675996 9063903894825317322 192916772619636604765586326883831074249
+zokrates generate-proof
+zokrates verify
